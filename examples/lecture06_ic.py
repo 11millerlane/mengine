@@ -20,7 +20,7 @@ for position in local_points:
     previous_global_points.append(global_points[-1])
     point = m.Shape(m.Sphere(radius=0.02), static=True, position=global_points[-1], rgba=[0, 0, 1, 1])
 
-rotation_center = [0.2, -0.2, 0]
+rotation_center = [0.2, -.2, 0]
 # rotation_center = [0, 0, 0]
 point_rc = m.Shape(m.Sphere(radius=0.02), static=True, position=rotation_center + np.array([0,0,0.1]), collision=False, rgba=[1, 0, 0, 1])
 

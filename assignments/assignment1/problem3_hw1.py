@@ -27,8 +27,19 @@ def sample_configuration():
     # NOTE: Be conscious of joint angle limits
     # output: q: joint angles of the robot
     # ------ TODO Student answer below -------
-    print('TODO sample_configuration')
-    return np.zeros(3)
+    q1_range = [-np.pi, 2*np.pi]
+    q2_range = [-np.pi/2, np.pi/2]
+    q3_range = [-np.pi/2, np.pi/2]
+
+    q1 = np.random.uniform(q1_range[0],q1_range[1])
+    q2 = np.random.uniform(q2_range[0],q2_range[1])
+    q3 = np.random.uniform(q3_range[0],q3_range[1])
+
+    q = [q1, q2, q3]
+
+    #print('TODO sample_configuration')
+    return q
+    #return np.zeros(3)
     # ------ Student answer above -------
 
 
@@ -40,10 +51,38 @@ def calculate_FK(q, joint=3):
     # output: ee_position: position of the end effector
     #         ee_orientation: orientation of the end effector
     # ------ TODO Student answer below -------
-    print('TODO calculate_FK')
-    position = np.zeros(3)
-    orientation = np.zeros(4)
-    # orientation = m.get_quaternion(orientation) # NOTE: If you used transformation matrices, call this function to get a quaternion
+    theta1 = q[0]
+    theta2 = q[1]
+    theta3 = q[2]
+
+    L_1 = 0.3
+    L_2 = 0.4
+    L_3 = 0.5
+
+    T_01 = [[np.cos(theta1),-np.sin(theta1),0,0],
+            [np.sin(theta1), np.cos(theta1),0,0],
+            [      0,           0,          1,0],
+            [      0,           0,          0,1]]
+    T_12 = [[np.cos(theta2),-np.sin(theta2),0,L_1],
+            [np.sin(theta2), np.cos(theta2),0,0],
+            [      0,           0,          1,0],
+            [      0,           0,          0,1]]
+    T_23 = [[np.cos(theta3),-np.sin(theta3),0,L_2],
+            [np.sin(theta3), np.cos(theta3),0,0],
+            [      0,           0,          1,0],
+            [      0,           0,          0,1]]
+    T_34 = [[1,0,0,L_3],
+            [0,1,0,0],
+            [0,0,1,0],
+            [0,0,0,1]]
+    
+    position = np.matmul(np.matmul(np.matmul(T_01,T_12),T_23),T_34)
+    orientation = np.matmul(np.matmul(np.matmul(T_01,T_12),T_23),T_34)
+    orientation = np.concatenate((orientation,np.array([1])))
+    #print('TODO calculate_FK')
+    #position = np.zeros(3)
+    #orientation = np.zeros(4)
+    orientation = m.get_quaternion(orientation) # NOTE: If you used transformation matrices, call this function to get a quaternion
     # ------ Student answer above -------
     return position, orientation
 
@@ -69,7 +108,13 @@ def plot_workspace(positions):
     # Plot the workspace of the robot
     # input: positions: list of positions of the end effector
     # ------ TODO Student answer below -------
-    print('TODO plot_workspace')
+
+    #printing out spheres to denote the workspace
+    for p in positions:
+        color = [0, 0, 0, 1]
+        m.Shape(m.Sphere(radius=0.005), static=True, position=p, collision=False, rgba=color)
+
+    #print('TODO plot_workspace')
     return 0
     # ------ Student answer above -------
 
@@ -81,7 +126,48 @@ def check_collision(q, box_position, box_half_extents):
     #        box_half_extents: half extents of the collision region
     # output: in_collision: True if the robot is in collision region, False otherwise
     # ------ TODO Student answer below -------
-    print('TODO check_collision')
+    xbox = box_position[0]
+    ybox = box_position[1]
+    zbox = box_position[2]
+
+    xhalf = box_half_extents[0]
+    yhalf = box_half_extents[1]
+    zhalf = box_half_extents[2]
+
+    theta1 = q[0]
+    theta2 = q[1]
+    theta3 = q[2]
+
+    L_1 = 0.3
+    L_2 = 0.4
+    L_3 = 0.5
+
+    T_01 = [[np.cos(theta1),-np.sin(theta1),0,0],
+            [np.sin(theta1), np.cos(theta1),0,0],
+            [      0,           0,          1,0],
+            [      0,           0,          0,1]]
+    T_12 = [[np.cos(theta2),-np.sin(theta2),0,L_1],
+            [np.sin(theta2), np.cos(theta2),0,0],
+            [      0,           0,          1,0],
+            [      0,           0,          0,1]]
+    T_23 = [[np.cos(theta3),-np.sin(theta3),0,L_2],
+            [np.sin(theta3), np.cos(theta3),0,0],
+            [      0,           0,          1,0],
+            [      0,           0,          0,1]]
+    T_34 = [[1,0,0,L_3],
+            [0,1,0,0],
+            [0,0,1,0],
+            [0,0,0,1]]
+    
+    position = np.matmul(np.matmul(np.matmul(T_01,T_12),T_23),T_34)
+
+    if xbox - xhalf <= position[0] <= xbox + xhalf:
+        return True
+    if ybox - yhalf <= position[1] <= ybox + yhalf:
+        return True
+    if zbox - zhalf <= position[2] <= zbox + zhalf:
+        return True
+    #print('TODO check_collision')
     return False
     # ------ Student answer above -------
 
@@ -130,14 +216,14 @@ while True:
 # ------ TODO Student answer below -------
 for i in range(1000):
     # sample a random configuration q
-    # TODO
+    q = sample_configuration() # TODO
     # move robot into configuration q
     robot.control(q, set_instantly=True)
     m.step_simulation(realtime=True)
     # calculate ee_position, ee_orientation using calculate_FK
-    # TODO
+    ee_position, ee_orientation = calculate_FK(q, joint=3) # TODO
     # plot workspace as points of the end effector
-    # TODO
+    plot_workspace(positions) # TODO
 # ------ Student answer above -------
 
 # NOTE: Press enter to continue to problem 3.3

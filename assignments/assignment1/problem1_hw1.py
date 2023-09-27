@@ -30,9 +30,13 @@ def rodrigues_formula(n, x, theta):
     # input: n, x, theta: axis, point, angle
     # output: x_new: new point after rotation
     # ------ TODO Student answer below -------
-    return np.zeros(3)
+    n = np.array(n)
+    n = n.T #I think this fixes the dimensionality errors
+    x = np.array(x)
+    x_new = n * (n.dot(x)) + np.sin(theta)*(np.cross(n,x)) - np.cross(np.cos(theta)*n, (np.cross(n,x)))
+    return x_new
+    #return np.zeros(3)
     # ------ Student answer above -------
-
 
 def rotate_euler(alpha, beta, gamma, x):
     # Rotate a point x using euler angles (alpha, beta, gamma)
@@ -40,7 +44,15 @@ def rotate_euler(alpha, beta, gamma, x):
     # output: x_new: new point after rotation
 
     # ------ TODO Student answer below -------
-    return np.zeros(3)
+    a = alpha
+    b = beta
+    g = gamma
+    R = np.array([  [np.cos(a)*np.cos(b)*np.cos(g)-np.sin(a)*np.sin(g),   -np.cos(g)*np.sin(a)-np.cos(a)*np.cos(b)*np.sin(g),   np.cos(a)*np.sin(b)],
+                    [np.cos(a)*np.sin(g)+np.cos(b)*np.cos(g)*np.sin(a),   np.cos(a)*np.cos(g)-np.cos(b)*np.sin(a)*np.sin(g),    np.sin(a)*np.sin(b)],
+                    [-np.cos(g)*np.sin(b),                                np.sin(b)*np.sin(g),                                  np.cos(b)]])
+    x_new = np.matmul(R, x.T)
+    return x_new
+    # return np.zeros(3)
     # ------ Student answer above -------
 
 
@@ -50,7 +62,14 @@ def euler_to_rotation_matrix(alpha, beta, gamma):
     # output: R: rotation matrix
 
     # ------ TODO Student answer below -------
-    return np.zeros((3,3))
+    a = alpha
+    b = beta
+    g = gamma
+    R = np.array([  [np.cos(a)*np.cos(b)*np.cos(g)-np.sin(a)*np.sin(g),   -np.cos(g)*np.sin(a)-np.cos(a)*np.cos(b)*np.sin(g),   np.cos(a)*np.sin(b)],
+                    [np.cos(a)*np.sin(g)+np.cos(b)*np.cos(g)*np.sin(a),   np.cos(a)*np.cos(g)-np.cos(b)*np.sin(a)*np.sin(g),    np.sin(a)*np.sin(b)],
+                    [-np.cos(g)*np.sin(b),                                np.sin(b)*np.sin(g),                                  np.cos(b)]])
+    return R
+    #return np.zeros((3,3))
     # ------ Student answer above -------
 
 
@@ -59,7 +78,19 @@ def euler_to_axis_angle(alpha, beta, gamma):
     # input: alpha, beta, gamma: euler angles
     # output: n, theta
     # ------ TODO Student answer below -------
-    return np.zeros(3), 0
+    a = alpha
+    b = beta
+    g = gamma
+    R = np.array([  [np.cos(a)*np.cos(b)*np.cos(g)-np.sin(a)*np.sin(g),   -np.cos(g)*np.sin(a)-np.cos(a)*np.cos(b)*np.sin(g),   np.cos(a)*np.sin(b)],
+                    [np.cos(a)*np.sin(g)+np.cos(b)*np.cos(g)*np.sin(a),   np.cos(a)*np.cos(g)-np.cos(b)*np.sin(a)*np.sin(g),    np.sin(a)*np.sin(b)],
+                    [-np.cos(g)*np.sin(b),                                np.sin(b)*np.sin(g),                                  np.cos(b)]])
+    theta = np.arccos((np.trace(R))/2)
+    n_x = (R[2][1]-R[1][2])/(2*np.sin(theta))
+    n_y = (R[0][2]-R[2][0])/(2*np.sin(theta))
+    n_z = (R[1][0]-R[0][1])/(2*np.sin(theta))
+    n = [n_x,n_y,n_z]
+    return n, theta
+    # return np.zeros(3), 0
     # ------ Student answer above -------
 
 

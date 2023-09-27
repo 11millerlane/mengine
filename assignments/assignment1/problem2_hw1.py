@@ -26,7 +26,17 @@ def apply_transform(pos, orient, d, euler):
     #        euler: target rotation in euler angles
     # output: pos_new, orient_new: new position and orientation (rotation matrix) of the box
     # ------ TODO Student answer below -------
-    return np.zeros(3), np.eye(3)
+    pos_new = pos + d 
+    a = euler[0]
+    b = euler[1]
+    g = euler[2]
+    R = np.array([  [np.cos(a)*np.cos(b)*np.cos(g)-np.sin(a)*np.sin(g),   -np.cos(g)*np.sin(a)-np.cos(a)*np.cos(b)*np.sin(g),   np.cos(a)*np.sin(b)],
+                    [np.cos(a)*np.sin(g)+np.cos(b)*np.cos(g)*np.sin(a),   np.cos(a)*np.cos(g)-np.cos(b)*np.sin(a)*np.sin(g),    np.sin(a)*np.sin(b)],
+                    [-np.cos(g)*np.sin(b),                                np.sin(b)*np.sin(g),                                  np.cos(b)]])
+    pos = np.array(pos)
+    orient_new = np.matmul(R, pos.T)
+    return pos_new, orient_new
+    #return np.zeros(3), np.eye(3)
     # ------ Student answer above -------
 
 # Test cases for rotations
